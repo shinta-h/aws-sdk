@@ -170,13 +170,13 @@ ec2Query
     -> EC2 m (EC2Response (Source m o))
 ec2Query action params cond = do
     ctx <- get
+    let mgr = manager ctx
+    let cred = credential ctx
+    let ep = endpoint ctx
+    time <- liftIO getCurrentTime
+    let url = mkUrl ep cred time action params
+    request <- liftIO $ HTTP.parseUrl (BSC.unpack url)
     lift $ do
-        let mgr = manager ctx
-        let cred = credential ctx
-        let ep = endpoint ctx
-        time <- liftIO getCurrentTime
-        let url = mkUrl ep cred time action params
-        request <- liftIO $ HTTP.parseUrl (BSC.unpack url)
         response <- HTTP.http request mgr
         (res, _) <- unwrapResumable $ HTTP.responseBody response
         (src, rid) <- res $= XmlP.parseBytes XmlP.def $$+ sinkRequestId
