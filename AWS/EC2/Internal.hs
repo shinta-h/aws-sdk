@@ -254,3 +254,16 @@ volumeStatusInfoStatus t
     | t == "impaired"          = VSIImpaired
     | t == "insufficient-data" = VSIInsufficientData
     | otherwise                = err "VolumeStatusInfo Status" t
+
+routeState :: Text -> RouteState
+routeState t
+    | t == "active"    = RouteStateActive
+    | t == "blackhole" = RouteStateBlackhole
+    | otherwise        = err "Route State" t
+
+routeOrigin :: Text -> RouteOrigin
+routeOrigin t
+    | t == "CreateRouteTable"          = RouteOriginCreateRouteTable
+    | t == "CreateRoute"               = RouteOriginCreateRoute
+    | t == "EnableVgwRoutePropagation" = RouteOriginTableEnableVgwRoutePropagation
+    | otherwise                        = err "Route Origin" t
