@@ -5,6 +5,7 @@ module AWS.EC2.VPC
     , createVpnGateway
     , deleteVpc
     , deleteVpnGateway
+    , describeDhcpOptions
     , describeVpnConnections
     , describeVpnGateways
     , describeVpcs
@@ -183,3 +184,34 @@ deleteVpnGateway
 deleteVpnGateway vgId = do
     ec2Query "DeleteVpnGateway" [ ValueParam "VpnGatewayId" vgId ] $
         getF "return" textToBool
+
+------------------------------------------------------------
+-- describeDhcpOptions
+------------------------------------------------------------
+describeDhcpOptions
+    :: (MonadResource m, MonadBaseControl IO m)
+    => [Text] -- ^ DhcpOptionsId
+    -> [Filter] -- ^ Filter
+    -> EC2 m (ResumableSource m DhcpOptions)
+describeDhcpOptions dhcpOptionsIds filters =
+    ec2QuerySource "DescribeDhcpOptions" params $
+        itemConduit "dhcpOptionsSet" dhcpOptionsSink
+  where
+    params = [ ArrayParams "DhcpOptionsId" dhcpOptionsIds
+             , FilterParams filters
+             ]
+
+dhcpOptionsSink
+    :: (MonadBaseControl IO m, MonadResource m)
+    => GLSink Event m DhcpOptions
+dhcpOptionsSink = DhcpOptions
+    <$> getT "dhcpOptionsId"
+    <*> itemsSet "dhcpConfigurationSet" dhcpConfigurationSink
+    <*> resourceTagSink
+
+dhcpConfigurationSink
+    :: MonadThrow m
+    => GLSink Event m DhcpConfigurationItem
+dhcpConfigurationSink = DhcpConfigurationItem
+    <$> getT "key"
+    <*> itemsSet "valueSet" (DhcpValue <$> getT "value")

@@ -16,6 +16,9 @@ module AWS.EC2.Types
     , CreateSubnetRequest(..)
     , CreateVolumeRequest(..)
     , CreateVpnGatewayType(..)
+    , DhcpConfigurationItem(..)
+    , DhcpOptions(..)
+    , DhcpValue(..)
     , DisassociateAddressRequest(..)
     , EbsBlockDevice(..)
     , EbsSource(..)
@@ -1010,3 +1013,22 @@ data AttachmentState
   deriving (Show, Eq)
 
 data CreateVpnGatewayType = CreateVpnGatewayTypeIpsec1
+  deriving (Show, Eq)
+
+data DhcpOptions = DhcpOptions
+    { dhcpOptionsDhcpOptionsId :: Text
+    , dhcpOptionsDhcpConfigurationSet :: [DhcpConfigurationItem]
+    , dhcpOptionsTagSet :: [ResourceTag]
+    }
+  deriving (Show, Eq)
+
+data DhcpConfigurationItem = DhcpConfigurationItem
+    { dhcpConfigurationItemKey :: Text
+    , dhcpConfigurationItemValueSet :: [DhcpValue]
+    }
+  deriving (Show, Eq)
+
+data DhcpValue = DhcpValue
+    { dhcpValueValue :: Text
+    }
+  deriving (Show, Eq)
